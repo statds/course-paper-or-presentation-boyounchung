@@ -1,0 +1,418 @@
+\documentclass{beamer}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage{newtxtext,newtxmath}
+\usetheme{madrid}
+\title[Analysis of binary outcomes]{Analysis of binary outcomes with missing data: missing = smoking, last observation carried forward, and a little multiple imputation}
+\author{Presenter: Boyoun Chung}
+\institute{Authors: Donald Hedeker, Robin J. Mermelstein, Hakan Demirtas}
+\date[STAT 5095]{STAT 5095, Department of Statistics, UConn}
+\begin{document}
+\footnotesize
+\maketitle
+%=================================================
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+%=================================================
+\begin{frame}
+\frametitle{Table of Contents}
+\tableofcontents
+\end{frame}
+%=================================================
+\section{Introduction and background}
+%=================================================
+\begin{frame}
+\frametitle{Background}
+\begin{itemize}
+\item Binary outcomes are common in many research areas, notably in studies of drug use, alcohol and smoking. 
+\vspace{10pt}
+\item How to handle missing values in an outcome variable has been a continuing source of controversy and debate \citep{schafer2002missing}. 
+\vspace{10pt}
+\item In this paper, authors consider this problem in a simple two-group design (e.g. control versus treatment), where the groups are compared in terms of a single binary outcome \citep{hedeker2007analysis}. 
+\vspace{10pt}
+\item Also, authors focus on smoking as the outcome, although the issues and methods described.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Background of deterministic imputations}
+\begin{itemize}
+\item A common approach to dealing with missing smoking outcomes is to recode them as ``smoking".
+\vspace{10pt} 
+\item This is often called a ``conservative" assumption, in the sense that it is conservative to assume the worse of the two values of the outcome (i.e. smoking). 
+\vspace{10pt}
+\item Another relatively common deterministic imputation approach, is to recode the missing data on the final smoking outcome to the last available smoking.
+\vspace{10pt}
+\item This procedure is termed ``last observation carried forward'', or LOCF. 
+\vspace{10pt}
+\item That is used in studies with more than one time-point where interest focuses on comparing two groups at a final time-point (longitudinal study).
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Disadvantages of deterministic imputations (1)}
+\begin{itemize}
+\item Deterministic imputations, like missing = smoking and LOCF, can be shown to yield severely biased results for several reasons \citep{schafer2002missing}. 
+\vspace{10pt} 
+\item First, if the missing data are related to group membership (i.e. control or treatment), then the comparison of groups on the outcome is confounded with the missing data.
+\vspace{10pt}
+\item For example, if there are more missing data in the control group, then the ``conservative" missing = smoking assumption yields a test that favors the treatment group.
+\vspace{10pt}
+\item Similarly, under LOCF, if time of dropout is related to group (i.e. control subjects drop out early, whereas treatment subjects
+drop out late or not at all), then group comparisons of the outcome are confounded with the amount and/or time of treatment.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Disadvantages of deterministic imputations (2)}
+\begin{itemize}
+\item A further problem is that these deterministic imputations produce variance estimates that are artificially small, because the missing data are treated as a constant.
+\vspace{10pt} 
+\item This leads to biased estimates of association involving the recoded outcome variable, and measures of
+uncertainty (i.e. variances, standard errors) that are too small.
+\vspace{10pt}
+\item This yields standard errors of estimated associations are too small, resulting artificially low p-values and rates of Type I error that are higher than nominal levels.
+\vspace{10pt}
+\item In the rest of this paper, authors illustrate why these deterministic imputations are logically problematic, and
+how they can be improved upon easily by positing them as non-perfect relationships.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{The relationship between smoking behavior and group}
+\begin{itemize}
+\item Suppose that there are two groups (treatment and control) and we are interested in whether smoking (yes or
+no) varies by group at a single time-point. 
+\vspace{10pt} 
+\item A simple $2\times 2$ table of group by smoking, with a Pearson’s $\chi^2$ test, can address this.
+\vspace{10pt} 
+\item Unfortunately, it may be complicated by the fact that not everyone has a measurement on the smoking variable.
+\end{itemize}
+\begin{table}
+\caption{Table of smoking outcome by treatment group}\label{tbl0}
+\centering
+\begin{tabular}{c|cc|c}\hline
+ & Smoking & Not smoking & Total \\\hline
+Control & $m_{11}$ & $m_{12}$ & $m_{1\cdot}$\\
+Treatment  & $m_{21}$ & $m_{22}$ & $m_{2\cdot}$\\\hline
+Total  & $m_{\cdot1}$ & $m_{\cdot2}$ & $N$\\\hline
+\end{tabular}
+\end{table}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{The relationship between smoking and missingness}
+\begin{itemize}
+\item We will describe a way in which we can classify these missing individuals in the $2\times 2$ table of group by smoking, based on an assumed relationship between missingness and smoking (e.x, odds ratio).
+\vspace{10pt} 
+\item While unknown, the numbers in the second row of Table \ref{tbl1} can be expressed as a simple function of the numbers in the first row and the odds ratio, denoted $\theta$.
+\vspace{10pt} 
+\item We have $\hat\theta = \frac{n_{11}n_{22}}{n_{12}n_{21}}$, which reflects the association between missingness and smoking.
+\vspace{10pt} 
+\item Note that $n_{21}$ and $n_{22}$ are unobserved, though $n_{2\cdot}$ is known.
+\end{itemize}
+\centering
+\begin{table}
+\caption{2. Table of missingness by smoking outcome}\label{tbl1}
+\begin{tabular}{c|cc|c}\hline
+ & Smoking & Not smoking & Total \\\hline
+Observed & $n_{11}$ & $n_{12}$ & $n_{1\cdot}$\\
+Missing & $n_{21}$ & $n_{22}$ & $n_{2\cdot}$\\\hline
+Total  & $n_{\cdot1}$ & $n_{\cdot2}$ & $N$\\\hline
+\end{tabular}
+\end{table}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Using assumed relationship between smoking and missingness}
+\begin{itemize}
+\item Note that $\hat\theta$ can be written as follows.
+\begin{align}
+\frac{n_{22}}{n_{21}} &= \hat\theta\times\frac{n_{12}}{n_{11}}
+\end{align}
+\item Since $n_{22} + n_{21} = n_{2\cdot}$ is known, we can specify $n_{22}$ and $n_{21}$ if $\hat\theta$ is known as $\theta^*$. 
+\vspace{10pt}
+\item Specifically, we assume the probability of smoking for missing individuals under $\theta^*$ (i.e., $\pi(\theta^*)$) and the observed odds of smoking (i.e., $n_{12}/n_{11}$) for the non-missing subjects.
+\begin{align}\label{eq1}
+\pi(\theta^*) &= Pr(smoking\mid~missing,~\theta^*) = \frac{\theta^*\times n_{12}/n_{11}}{1 + \theta^*\times n_{12}/n_{11}}\\
+n_{21} &= n_{2\cdot}\times \pi(\theta^*) \nonumber\\
+n_{22} &=  n_{2\cdot}\times (1 - \pi(\theta^*) )  \nonumber
+\end{align}
+\item After we obtain the complete table of Missing vs Smoking, we can specify the $2\times 2$ table of smoking outcome by treatment group.
+\end{itemize}
+\end{frame}
+%=================================================
+\section{Deterministic imputations: missing = smoking}
+%=================================================
+\begin{frame}
+\frametitle{Example: the smoking cessation study \citep{gruder1993effects}}
+\begin{itemize}
+\item \citet{gruder1993effects} evaluated the effectiveness of adding group-based treatment adjuncts to a smoking cessation intervention comprised of a television program and self-help materials. 
+\vspace{10pt}
+\item The primary hypothesis of the study was that participants in the social support training condition would have {\bf higher} abstinence rates than those in the general group discussion condition.
+\vspace{10pt}
+\item Participants were smokers who registered for the television-based program (to receive the self-help materials) and who indicated an interest in attending group-based meetings.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{The smoking cessation study (continued)}
+\begin{itemize}
+\item Although participants were randomized to condition, only $50\%$ of the participants scheduled to attend a group session came to at least one meeting. 
+\vspace{10pt}
+\item Thus, for analysis, the original report considered four ‘conditions’: the two group treatments, a ‘no show’ group consisting of individuals who were randomized to a group treatment but never showed up for any group meetings, and the no-contact control condition.
+\vspace{10pt}
+\item Here, for simplicity and exposition, we combine the controls and no-shows as one group and the two active treatments as a second group. 
+\vspace{10pt}
+\item Hereafter, we refer to this first group as control and the second as treatment.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Missing vs smoking status at the final time point}
+\begin{table}
+\caption{3. Table of missingness (Miss) by Smoke, \citep{gruder1993effects}}\label{tbl2}
+\centering
+\begin{tabular}{c|cc|c}\hline
+ & Not smoking & Smoking & Total \\\hline
+Observed & 78 & 294 & 372 \\
+Missing  & $n_{21}$ & $n_{22}$ & 117 \\\hline
+Total  & $n_{\cdot1}$ & $n_{\cdot2}$ & 489\\\hline
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item Table \ref{tbl2} lists the frequencies for the cross-tabulation of missing by smoking status at the final study time-point (i.e. at 24 months).
+\vspace{10pt}
+\item For the observed individuals, the odds of smoking equal to $294/78 = 3.77$.
+\vspace{10pt}
+\item The amount of missing data is rather large, accounting for approximately $24\%$ of the total number of individuals.
+\vspace{10pt}
+\item Thus, it would seem that the statistical analysis and resulting conclusions could be influenced by whatever is assumed for the missing data.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Result of complete-cases analysis}
+\begin{itemize}
+\item Analyzing only the available data (i.e. $n = 372$), the smoking rate in the control group is $176/216 = 81.48\%$ and 118/156 = $75.64\%$ in the treatment group. 
+\vspace{10pt}
+\item The simple Pearson’s $\chi^2$ test yields $X = 1.86$, d.f. = 1, $p-value = 0.086$ (one-sided), which is not significant.
+\vspace{10pt}
+\item If one assumes ``missing = smoking", then the smoking rates are $259/299 = 86.62\%$ and $152/190 = 80.00\%$ for the control
+and treatment groups, respectively.
+\vspace{10pt}
+\item In this case, we obtain $X = 3.80$, d.f. = 1, $p-value = 0.025$ (one-sided p-value), which is significant at $\alpha = 0.05$.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{The smoking cessation study (continued)}
+\begin{itemize}
+\item Why are the results from these two analyses different?
+\vspace{10pt}
+\item Of the 117 missing individuals, $83$ are from the control group and $34$ from the treatment group, while the total
+number of control and treatment subjects equals $299$ and $190$, respectively. 
+\vspace{10pt}
+\item Thus, missingness is more common among the control group ($83/299 = 27.8\%$) than the treatment group ($34/190 = 17.9\%$), and so the ``conservative" missing = smoking assumption yields many more smokers in the control than the treatment group.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{The smoking cessation study (continued)}
+\begin{itemize}
+\item As an alternative to deterministically recoding missing to smoking, we can examine what happens under various assumed values of the $\theta^*$ for missing and smoking.
+\vspace{10pt}
+\item For example, assuming that $\theta^* = 2$ (i.e. the odds of smoking are double in the missing subjects than the non-missing subjects).
+\begin{align}
+\pi(2) = \frac{2\times 294/78}{1 + 2\times 294/78} = 0.8829
+\end{align}
+\item This implies an assumed smoking rate of $88.29\%$ for missing individuals. 
+\vspace{10pt}
+\item As discussed in Eq. (\ref{eq1}), the number of missing individuals who are smoking is calculated as $n_{22} = 0.8829 \times 117 =
+103.2993$, and the number of non-smoking missing individuals is $n_{12} = 117–103.2993 = 13.7007$. 
+\vspace{10pt}
+\item These yield an odds of smoking of 7.54 for missing individuals (i.e. a doubling of the observed odds of smoking), implying
+that missing individuals have nearly an 8 to 1 odds of smoking under the $\theta^* = 2$ assumption.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{The smoking cessation study (continued)}
+\begin{table}
+\caption{4. Table of Group by Smoke under $\theta^* = 2$ for Miss and Smoke.}\label{tbl3}
+\centering
+\begin{tabular}{c|cc|c}\hline
+ & Not smoking & Smoking & Total \\\hline
+Treatment & 38 + {\color{red}3.9820} & 118 + {\color{red}30.0180} & 190 \\
+Control & 40 + {\color{red}9.7207} & 176 + {\color{red}73.2793} & 299 \\\hline
+Total  & 91.7027 & 397.2973 & 489\\\hline
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item The number of missing smokers in the two groups can be calculated by multiplying this probability by the number of missing individuals in the group.
+\begin{align}
+n_{22c} = 0.1171\times 83 = 9.7207,~~~n_{22t} = 0.1171\times 34 = 3.9814  \\
+n_{22c} = 0.8829\times 83 = 73.2793,~~~n_{22t} = 0.8829\times 34 = 30.0180 \nonumber
+\end{align}
+\item Using these calculated frequencies to augment the observed data yields the results presented in Table 3.
+\item The Pearson’s $\chi^2$ test yields $X = 2.28$, d.f. = 1, $p-value = 0.066$ (one-sided), which is not significant. 
+\item This calculation can be repeated under other assumed values of the OR to obtain a sense of the robustness of the results.
+\item The one-sided p-values decrease to $0.05$, $0.045$ and $0.04$ for $\theta^* = 3$, 4, and 5, respectively.
+\end{itemize}
+\end{frame}
+%=================================================
+\section{Deterministic imputations: LOCF}
+%=================================================
+\begin{frame}
+\frametitle{Using previous smoking information}
+\begin{table}
+\caption{5. Table of missingness (Miss) by Smoke stratified by prior smoking outcome (Smoke()).}\label{tbl4}
+\centering
+\begin{tabular}{c|ccc}\hline
+Smoke() = Non-smoking & Not smoking & Smoking & Total \\\hline
+Observed & $n_{111} = 42$ & $n_{112} = 71$ & $n_{11\cdot} = 113$ \\
+Missing & $n_{121}$ & $n_{122}$ & $n_{12\cdot} = 37$ \\\hline
+Total  & $n_{1\cdot1}$ & $n_{1\cdot1}$ & $n_{1\cdot\cdot} = 150$\\\hline
+\end{tabular}
+\begin{tabular}{c|ccc}\hline
+Smoke() = Smoking & Not smoking & Smoking & Total \\\hline
+Observed & $n_{211} = 36$ & $n_{212} = 223$ & $n_{21\cdot} = 259$ \\
+Missing & $n_{221}$ & $n_{222}$ & $n_{22\cdot} = 80$ \\\hline
+Total  & $n_{2\cdot1}$ & $n_{2\cdot1}$ & $n_{2\cdot\cdot} = 339$\\\hline
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item Another simple imputation technique that is common in longitudinal studies is ``last observation carried forward" (LOCF). 
+\item LOCF posits a perfect relationship in the sense that missing observations are related perfectly to previously observed values.
+\item For this, consider the $2\times 2$ cross-tabulation of missing by smoking status in Table \ref{tbl4}, stratified by smoking status at
+a previous time-point.
+\item The smoking assessment at the previous time-point is denoted as Smoke().
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Using information from previous smoking behavior}
+\begin{itemize}
+\item The LOCF imputation would set all missing observations in the left-side table to non-smoking (i.e. $n_{121} = 37$ and $n_{222} = 0$) and all missing observations in the right-side table to smoking ($n_{221} = 0$ and $n_{222} = 80$).
+\vspace{10pt}
+\item This would produce $\theta^*$ going to zero and positive infinity in the two tables, respectively.
+\vspace{10pt}
+\item Such deterministic imputation can be improved easily upon using the ideas of the $\theta^*$.
+\vspace{10pt}
+\item To improve the result, we employ pre-assumed odds ratio between Missing and Smoking from the previous time point.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Using assumed odds ratio between missingness and smoking}
+\begin{itemize}
+\item Define $\pi_i =  Pr(smoking~at~time~i~\mid~missing~at~time~i,~\theta^*)$ as follows 
+\begin{align}
+\pi_i &= \frac{\theta_{i}^*\times n_{i12}/n_{i11}}{1 + \theta_{i}^*\times n_{i12}/n_{i11}},~~~i=1,2
+\end{align}
+\item Here, $\theta_{i}^*$ is the assumed odds ratio for the $i$th table, and $n_{i12}/n_{i11}$ are the observed odds of smoking for the $i$th table. $\pi_i$ is the probability of smoking for the missing individuals under the assumed $\theta_{i}^*$ of the $i$th table.
+\vspace{10pt}
+\item Note that, the observed odds of smoking equal to $71/42 = 1.6905$ and $223/36 = 6.1944$, depending on previous smoking status.
+\vspace{10pt}
+\item LOCF implies $\theta_{1}^* = 0$, which seems strong assumption.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Probability of smoking for the missing individuals}
+\begin{itemize}
+\item In this example, continuing with the assumption of $\theta_{1}^* = \theta_{2}^* = 2$ for missing and smoking, we can calculate $\pi_1$ and $\pi_2$ as follows.
+\begin{align}
+\pi_{1} &= \frac{2\times 71/42}{1 + 2\times 71/42} = 0.7717 \\
+\pi_{2} &= \frac{2\times 223/36}{1 + 2\times 223/36} =0.9253 \nonumber
+\end{align}
+\item Thus, among those who are missing at the current time-point, subjects who were smoking at the previous time point have a very high assumed probability of smoking (0.9253)
+\vspace{10pt}
+\item On the other hand, subjects who were not smoking at the previouis time point have a lower smoking probability (0.7717).
+\vspace{10pt}
+\item It is known that $n_{22\cdot} = 80$ people who smoked in the previous time are divided into $61$ for control group and $19$ for treatment group.
+\vspace{10pt}
+\item Similarly, $n_{12\cdot} = 37$ people who did not smoke in the previous time are divided into $22$ for control group and $15$ for treatment group.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Estimating frequencies based on previous information}
+\begin{itemize}
+\item Using $\pi_1$, $\pi_2$, and knowing the numbers of missing control and treatment subjects in each of these two tables, we can calculate the numbers of missing individuals who are smoking in the control and treatment groups as in Eq. (\ref{eq3})
+\begin{align}\label{eq3}
+n_{112c} & = (1 - 0.7717)\times 22 = {\color{red}5.0226},~n_{112t} = (1 - 0.7717)\times 15 = {\color{red}3.4245} \\
+n_{212c} & = (1 - 0.9253)\times 61 = {\color{red}4.5567},~n_{212t} = (1 - 0.9253)\times 19 = {\color{red}1.4193} \nonumber\\
+n_{122c} & = 0.7717\times 22 = {\color{blue}16.9774},~n_{122t} = 0.7717\times 15 = {\color{blue}11.5755} \nonumber\\
+n_{222c} & = 0.9253\times 61 = {\color{blue}56.4433},~n_{222t} = 0.9253\times 19 = {\color{blue}17.5807} \nonumber
+\end{align}
+\item The smoking rates for the control and treatment groups now equal $83.42\%$ and $77.45\%$, respectively, and
+the $\chi^2$ test statistic is $X = 2.70$, d.f. = 1, $p-value = 0.055$ (one-sided).
+\end{itemize}
+\centering
+\begin{tabular}{c|ccc}\hline
+Group & Not smoking & Smoking & Total \\\hline
+Treatment & 38 + {\color{red}3.4245} + {\color{red}1.4193} & 118 + {\color{blue}11.5755} + {\color{blue}17.5807} & 190 \\
+Control & 40 + {\color{red}5.0226} + {\color{red}4.5567} & 176 + {\color{blue}16.9774} + {\color{blue}56.4433} & 299 \\\hline
+Total  & 92.4231 & 396.5769 & 489\\\hline
+\end{tabular}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Odds ratios from different assumption ($\theta^*$)}
+\begin{table}
+\caption{6. Group by Smoke analyses under different missing data assumptions.}\label{tbl5}
+\centering
+\begin{tabular}{c|cc|cc}\hline\hline
+ & \multicolumn{2}{c}{Smoking frequencies (proportions)}&  \\\cline{2-5}
+Scenario & Control & Treatment & $\chi^2$ & p-value \\\hline
+Available data (n = 372) & 176/216 (81.48) & 118/156 (75.64) & 1.87 & 0.085 \\\hline
+Missing = smoking (n = 489) & 259/299 (86.62) & 152/190 (80.00) & 3.80 & 0.025 \\\hline
+Marginal $\theta^* = 1$ & 241.60/299 (80.80) & 144.87/190 (76.25) & 1.45 & 0.114 \\\hline
+Marginal $\theta^* = 2$ & 249.28/299 (83.37) & 148.02/190 (77.90) & 2.28 & 0.065 \\\hline
+Marginal $\theta^* = 5$ & 254.82/299 (85.22) & 150.29/190 (79.10) & 3.07 & 0.039 \\\hline
+Stratified $\theta_{1}^* = \theta_{2}^* = 1$ & 242.34/299 (81.05) & 143.78/190 (75.68) & 2.02 & 0.077 \\\hline
+Stratified $\theta_{1}^* = \theta_{2}^* = 2$ & 249.42/299 (83.42) & 147.16/190 (77.45) & 2.70 & 0.050 \\\hline
+Stratified $\theta_{1}^* = \theta_{2}^* = 5$ & 254.76/299 (85.21) & 149.82/190 (78.85) & 3.28 & 0.035 \\\hline\hline
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item Table \ref{tbl5} summarizes the results of this section for $\theta^*$ values of 1, 2 and 5.
+\item The ‘marginal’ results do not consider the previous smoking status, while the ‘stratified’ results consider the previous smoking status.
+\item $\theta^*= 1$ would imply that missing and smoking are independent, whereas an $\theta^*= 5$ implies strong relationship.
+\end{itemize}
+\end{frame}
+%=================================================
+\section{Discussion}
+%=================================================
+\begin{frame}
+\frametitle{Discussion}
+\begin{itemize}
+\item In this paper, authors have described a relatively simple approach for dealing with missing data in two-group
+studies with a binary outcome. 
+\vspace{10pt}
+\item The focus has been to use the ideas behind missing = smoking and LOCF in a relational manner.
+\vspace{10pt}
+\item We have argued that it is important to examine results under a range of plausible values for the association of missing and smoking, stratified by past smoking behavior. 
+\vspace{10pt}
+\item By performing a sensitivity analysis one can determine the robustness of results to the assumed association of missing and smoking.
+\vspace{10pt}
+\item In this regard, \citet{schafer2002missing} note that ``one hopes that similar conclusions will follow from a variety of realistic alternative assumptions; when that does not happen, the sensitivity should be reported". 
+\vspace{10pt}
+\item Thus, a major point of the argument is that blindly assuming ``missing = smoking" provides a very unrealistic solution.
+\end{itemize}
+\end{frame}
+%=================================================
+\begin{frame}
+\frametitle{Reference}
+\bibliographystyle{plainnat}
+\bibliography{Ref_file.bib}
+\end{frame}
+%=================================================
+\end{document}
